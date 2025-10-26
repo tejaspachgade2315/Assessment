@@ -1,0 +1,148 @@
+{
+  "info": {
+    "_postman_id": "b17b1e8c-7a3f-4a5e-a9e1-5f3b9b2caa12",
+    "name": "Real-Time Polling Platform API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Backend API for real-time polling system allowing organizers to create live polls and participants to vote via join codes."
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/user/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tejas Pachgade\",\n  \"email\": \"tejas@example.com\",\n  \"password\": \"securePassword123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tejas@example.com\",\n  \"password\": \"securePassword123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Session",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/session",
+              "host": ["{{base_url}}"],
+              "path": ["api", "session"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Frontend Tech Quiz\",\n  \"questions\": [\n    {\n      \"questionText\": \"Which JS framework do you prefer?\",\n      \"options\": [\n        { \"optionText\": \"React\" },\n        { \"optionText\": \"Vue\" },\n        { \"optionText\": \"Angular\" }\n      ]\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Sessions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/session",
+              "host": ["{{base_url}}"],
+              "path": ["api", "session"]
+            }
+          }
+        },
+        {
+          "name": "Get Session by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/session/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "session", ":id"]
+            }
+          }
+        },
+        {
+          "name": "Update Session (Start/Stop)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/session/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "session", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vote",
+      "item": [
+        {
+          "name": "Join Session via Join Code",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/vote/join/:joinCode",
+              "host": ["{{base_url}}"],
+              "path": ["api", "vote", "join", ":joinCode"]
+            }
+          }
+        },
+        {
+          "name": "Submit Vote",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/vote",
+              "host": ["{{base_url}}"],
+              "path": ["api", "vote"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"joinCode\": \"313D6C\",\n  \"answers\": [\n    {\n      \"questionId\": \"675aa9c812aa53a368fcb978\",\n      \"optionId\": \"opt_1\"\n    }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3232" },
+    { "key": "token", "value": "" }
+  ]
+}
