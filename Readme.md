@@ -25,10 +25,10 @@ Backend for a real-time polling platform where organizers create sessions & ques
 
 [https://assessment-ii9z.onrender.com](https://assessment-ii9z.onrender.com)
 
-
 ## Swagger Docs
 
 [https://assessment-ii9z.onrender.com/api-docs](https://assessment-ii9z.onrender.com/api-docs)
+
 ## API
 
 - Key endpoints:
