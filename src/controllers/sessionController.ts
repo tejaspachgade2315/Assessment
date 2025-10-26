@@ -50,6 +50,23 @@ export const createSession = async (req: Request, res: Response) => {
   }
 };
 
+export const getSessionById = async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.params;
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Session not found" });
+    }
+    res.status(200).json({ success: true, session });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: "Could not get session" });
+  }
+};
 export const updateSession = async (req: Request, res: Response) => {
   try {
     const { userId } = req.user as JwtPayload;

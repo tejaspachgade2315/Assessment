@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createSession,
   getAllSessions,
+  getSessionById,
   updateSession,
 } from "../controllers/sessionController";
 import {
@@ -20,5 +21,6 @@ router.post(
   createSession
 );
 router.get("/", getAllSessions);
+router.get("/:sessionId", getSessionById);
 router.patch("/:sessionId", authMiddleware, requireOrganizer, updateSession);
 export default router;

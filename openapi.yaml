@@ -1,0 +1,298 @@
+openapi: 3.1.0
+info:
+  title: Real-Time Polling Platform API
+  description: Backend API for real-time polling system allowing organizers to create live polls and participants to vote via join codes.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3232
+    description: Local development server
+
+tags:
+  - name: User
+    description: Authentication endpoints for organizers
+  - name: Session
+    description: Session and poll management
+  - name: Vote
+    description: Public voting and participation
+
+paths:
+  /api/user/register:
+    post:
+      tags: [User]
+      summary: Register a new user (organizer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
+      responses:
+        "201":
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+
+  /api/user/login:
+    post:
+      tags: [User]
+      summary: Login user and return JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        "200":
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /api/session:
+    post:
+      tags: [Session]
+      summary: Create new session (auth required)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSession"
+      responses:
+        "201":
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "401":
+          description: Unauthorized
+
+    get:
+      tags: [Session]
+      summary: Get all public sessions
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+
+  /api/session/{id}:
+    get:
+      tags: [Session]
+      summary: Get session by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          description: Session not found
+
+    patch:
+      tags: [Session]
+      summary: Update session (start/stop or modify)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSession"
+      responses:
+        "200":
+          description: Session updated successfully
+        "401":
+          description: Unauthorized
+
+  /api/vote/join/{joinCode}:
+    get:
+      tags: [Vote]
+      summary: Join session/poll via join code
+      parameters:
+        - name: joinCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session metadata for participants
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          description: Invalid join code
+
+  /api/vote:
+    post:
+      tags: [Vote]
+      summary: Submit vote in poll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoteRequest"
+      responses:
+        "202":
+          description: Vote accepted (async processing)
+        "400":
+          description: Invalid vote or duplicate attempt
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterUser:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+          example: "Tejas Pachgade"
+        email:
+          type: string
+          example: "tejas@example.com"
+        password:
+          type: string
+          example: "securePassword123"
+
+    LoginUser:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          example: "tejas@example.com"
+        password:
+          type: string
+          example: "securePassword123"
+
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Login successful"
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5..."
+
+    CreateSession:
+      type: object
+      required: [title, questions]
+      properties:
+        title:
+          type: string
+          example: "Frontend Tech Quiz"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+
+    UpdateSession:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [active, stopped, closed]
+          example: "active"
+        title:
+          type: string
+          example: "Updated Session Title"
+
+    Session:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "68fcb978958064b212aa53a3"
+        title:
+          type: string
+          example: "Real-Time Poll Demo"
+        joinCode:
+          type: string
+          example: "313D6C"
+        status:
+          type: string
+          enum: [draft, active, stopped]
+          example: "active"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+
+    Question:
+      type: object
+      properties:
+        questionText:
+          type: string
+          example: "Which JS framework do you prefer?"
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/Option"
+
+    Option:
+      type: object
+      properties:
+        optionText:
+          type: string
+          example: "React"
+        votes:
+          type: integer
+          example: 42
+
+    VoteRequest:
+      type: object
+      required: [joinCode, answers]
+      properties:
+        joinCode:
+          type: string
+          example: "313D6C"
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: string
+                example: "675aa9c812aa53a368fcb978"
+              optionId:
+                type: string
+                example: "opt_1"

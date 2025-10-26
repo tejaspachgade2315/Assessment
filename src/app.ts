@@ -9,6 +9,7 @@ const app: Application = express();
 import homeRoutes from "./routes/homeRoutes";
 import sessionRoutes from "./routes/sessionRoutes";
 import userRoutes from "./routes/userRoutes";
+import voteRoutes from "./routes/voteRoutes";
 
 // Middlewares
 app.use(cors({ origin: "*", credentials: true }));
@@ -28,5 +29,6 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api", homeRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/session", sessionRoutes);
+app.use("/api/vote", voteRoutes);
 
 export default app;
